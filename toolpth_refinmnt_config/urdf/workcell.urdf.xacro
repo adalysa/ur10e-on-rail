@@ -1,0 +1,66 @@
+<?xml version="1.0" ?>
+<robot name="myworkcell" xmlns:xacro="http://ros.org/wiki/xacro">
+  <xacro:include filename="$(find ur_description)/urdf/ur_macro.xacro"/>
+  <xacro:arg name="ur_type" default="ur10e"/>
+  <xacro:arg name="use_fake_hardware" default="true"/>
+  <xacro:arg name="fake_sensor_commands" default="true"/>
+  <xacro:ur_robot
+      prefix=""
+      joint_limits_parameters_file="$(find ur_description)/config/$(arg ur_type)/joint_limits.yaml"
+      kinematics_parameters_file="$(find ur_description)/config/$(arg ur_type)/default_kinematics.yaml"
+      physical_parameters_file="$(find ur_description)/config/$(arg ur_type)/physical_parameters.yaml"
+      visual_parameters_file="$(find ur_description)/config/$(arg ur_type)/visual_parameters.yaml"
+      use_fake_hardware="$(arg use_fake_hardware)"
+      fake_sensor_commands="$(arg fake_sensor_commands)"/>
+  <!-- materials -->
+  <material name="white">
+    <color rgba="1 1 1 1"/>
+  </material>
+  <!-- links -->
+  <link name="world"/>
+  <link name="table">
+    <visual>
+      <geometry>
+        <box size="1.0 0.3 0.05"/>
+      </geometry>
+      <material name="white"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="1.0 0.3 0.05"/>
+      </geometry>
+    </collision>
+  </link>
+  <link name="rail">
+    <visual>
+      <geometry>
+        <box size="3.0 0.3 0.05"/>
+      </geometry>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="3.0 0.3 0.05"/>
+      </geometry>
+    </collision>
+  </link>
+  <!-- joints -->
+  <joint name="world_to_rail" type="fixed">
+    <parent link="world"/>
+    <child link="rail"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <limit lower="-1.0" upper="1.0" effort="0.5" velocity="0.5"/>
+    <axis xyz=" 1 0 0"/> 
+  </joint>
+  <joint name="table_to_rail" type="prismatic">
+    <parent link="rail"/>
+    <child link="table"/>
+    <origin xyz="0 0 0.05" rpy="0 0 0"/>
+    <limit lower="-1.0" upper="1.0" effort="0.5" velocity="0.5"/>
+    <axis xyz=" 1 0 0"/> 
+  </joint>
+  <joint name="table_to_ur10e" type="fixed">
+    <parent link="table"/>
+    <child link="base_link"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+</robot>
